@@ -1,77 +1,35 @@
-const bodyparser = require('body-parser')
-const express = require('express')
-const res = require('express/lib/response')
-const { compileETag } = require('express/lib/utils')
-const app = express()
-const port = 5000
-const mongoose = require("mongoose");
+const dotenv = require('dotenv')
+dotenv.config()
 
-app.use(bodyparser.urlencoded({extended:false}))
-app.use(bodyparser.json())
+const bodyparser = require("body-parser");
+const express = require("express");
+const app = express();
+const port = 5000;
+require("./models/config");
+const user = require("./routes/userRoutes");
+const { transporter, mailOptions } = require("./Service/emailService");
+// const cron = require("node-cron");
 
+app.get("/send", async (req, res) => {
+  // cron.schedule("*/10 * * * * *", function(){
+  //     console.log("running a task every 10 second");
 
-mongoose.set('strictQuery', false);
-
-mongoose.connect("mongodb://127.0.0.1:27017/DemoDB",{
- useNewUrlParser:"true",
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email Sent Succesfully" + info.response);
+    }
+  });
 });
+// });
 
-mongoose.connection.on("error",(err)=>{
-    console.log("mongoose Connection Error", err);
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: false }));
+app.use(express.json());
+
+
+app.use("/", user);
+app.listen(process.env.PORT, function (req, res) {
+  console.log(`Server is running port no:${process.env.PORT}`);
 });
-
-mongoose.connection.on("connected",(err,res)=>{
-    console.log("mongoose is connected");
-});
-
-
-app.get("/", function(req,res){
-    return res.send({msg: "Welcome in Node js Web app Development."})
-})
-
-app.get("/detail", function(req,res){
-    res.send(
-        {
-            msg : "Hey this is detail page"
-        }
-        )
-})
-
-app.post("/signup", function(req,res){
-    console.log(req.body);
-    const {name,email} = req.body
-    console.log(name,email);
-    res.send(
-        {
-            msg : "none"
-        }
-    )
-})
-
-app.put("/login", function(req,res){
-    res.send(
-        {
-            msg: "This is login page"
-        }
-    )
-})
-
-app.patch("/patch", function(req,res){
-    res.send(
-        {
-            msg: "This is patch page"
-        }
-    )
-})
-
-app.delete("/delete", function(req,res){
-    res.send(
-        {
-            msg: "This is delete page"
-        }
-    )
-})
-
-app.listen(port, ()=>{
-    console.log(`Server is running port no:${port}`);
-})

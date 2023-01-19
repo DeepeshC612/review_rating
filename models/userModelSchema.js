@@ -1,3 +1,4 @@
+const { number, string } = require('joi')
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
@@ -13,8 +14,8 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    phonenumber : {
-        type : string,
+    phonenum : {
+        type : Number,
         required : true
     },
     city : {
@@ -25,10 +26,10 @@ const userSchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    profilePic : {
-        type : String,
-        required : true
-    },
+    // profilePic : {
+    //     type : String,
+    //     required : true
+    // },
     userRole : {
         type : String,
         required : true,
