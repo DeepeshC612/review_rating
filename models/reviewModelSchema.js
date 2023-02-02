@@ -1,14 +1,6 @@
 const mongoose = require('mongoose')
 
 const reviewSchema = new mongoose.Schema({
-    userName : {
-        type : String,
-        required : true
-    },
-    companyName : {
-        type : String,
-        required : true
-    },
     subject : {
         type : String,
         required : true
@@ -25,6 +17,16 @@ const reviewSchema = new mongoose.Schema({
         type : Boolean,
         required : true,
         default : true
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'user'
+    },
+    CompanyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'user'
     },
 }
 )
