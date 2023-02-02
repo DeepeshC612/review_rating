@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const compSchema = new mongoose.Schema({
-    userName : {
-        type : String,
-        required : true
-    },
     companyName : {
         type : String,
         required : true
@@ -21,11 +17,23 @@ const compSchema = new mongoose.Schema({
         type : Date,
         required : true
     },
+    CompanyLogo : {
+        type : String,
+        required : true
+    },
     isActive : {
         type : Boolean,
         required : true,
         default : true
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'user'
+    },
+    // company_logo : {
+    //     type: String,
+    // }
 }
 )
 compSchema.set('timestamps', true)
