@@ -25,9 +25,15 @@ var mailOptions = {
 
 transporter.sendMail(mailOptions, (error, info)=>{
   if (error){
-    console.log(error);
+    res.stauts(424).json({
+      success: "failure",
+      error: "Error Occure " + error.message
+    })
   } else {
-    console.log('Email sent successfully' + info.response);
+    res.stauts(200).json({
+      success: "success",
+      message: "Email send successfully " + info.response
+    })
   }
 })
 }

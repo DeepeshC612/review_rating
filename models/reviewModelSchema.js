@@ -26,7 +26,7 @@ const reviewSchema = new mongoose.Schema({
     CompanyId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'user'
+        ref: 'comp'
     },
 }
 )

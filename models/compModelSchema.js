@@ -17,7 +17,12 @@ const compSchema = new mongoose.Schema({
         type : Date,
         required : true
     },
-    CompanyLogo : {
+    companyRating : {
+        type : Number,
+        required : true,
+        default : 0
+    },
+    companyLogo : {
         type : String,
         required : true
     },
@@ -31,9 +36,6 @@ const compSchema = new mongoose.Schema({
         required: true,
         ref: 'user'
     },
-    // company_logo : {
-    //     type: String,
-    // }
 }
 )
 compSchema.set('timestamps', true)

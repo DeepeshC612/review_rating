@@ -10,25 +10,24 @@ const userSignup = async (req, res) => {
   });
   if (isemailExists) {
     return res.status(409).json({
-      status: "Conflict",
-      message: "User is already Exists",
+      success: "failure",
+      error: "User with this email is already exists",
     });
   } else {
     try {
       const salt = await bcrypt.genSalt(10);
       regData.password = await bcrypt.hash(req.body.password, salt);
-      const filePath = `uploads/${req.file.filename}`;
-      regData.profilePic=filePath;
-      let data = await regData.save();
+      const filePath = `uploads${req.file.filename}`;
+      regData.profilePic = filePath;
+      await regData.save();
       res.status(201).json({
-        status: "success",
-        message: "User is created Succesfully",
-        res: data,
+        success: "success",
+        message: "User is created succesfully",
       });
     } catch (err) {
       res.status(400).json({
-        status: "Failure",
-        data: "Error Occure" + err.message,
+        success: "failure",
+        error: "Error occure " + err.message,
       });
     }
   }
@@ -48,31 +47,38 @@ const userLogin = async (req, res) => {
             { expiresIn: "5d" }
           );
           res.status(200).send({
-            status: "success",
-            message: "Login Success",
-            data: user,
+            success: "success",
+            message: "Login success",
+            userDetails: {
+              userName: user.userName,
+              profilePic: user.profilePic,
+              userEmail: user.userEmail,
+            },
             token: token,
           });
         } else {
           res.status(401).send({
-            status: "Failed",
-            message: "Email or Password is not valid",
+            success: "failure",
+            error: "Email or Password is not valid",
           });
         }
       } else {
         res.status(401).send({
-          status: "Failed",
-          message: "You are not valid register user",
+          success: "failure",
+          error: "You are not valid register user",
         });
       }
     }
   } catch (Error) {
-    console.log(Error);
+    res.status(401).send({
+      success: "failure",
+      error: "Error Occure " + Error.message,
+    });
   }
 };
 
 const emailForResetPass = async (req, res) => {
-  const { userEmail } = req.body
+  const { userEmail } = req.body;
   try {
     const alreadyExits = await userSchema.findOne({ userEmail: userEmail });
     if (alreadyExits != null) {
@@ -80,67 +86,68 @@ const emailForResetPass = async (req, res) => {
       const token = await jwt.sign({ userId: alreadyExits._id }, secretKey, {
         expiresIn: "5d",
       });
-      mail.sendEmail(userEmail, alreadyExits._id, token)
+      mail.sendEmail(userEmail, alreadyExits._id, token);
       return res.status(200).json({
-        status: "success",
+        success: "success",
         message: "Email send sucessfully",
         token: token,
         userId: alreadyExits._id,
       });
     } else {
       res.status(550).json({
-        status: "faild",
-        message: "This email is not found",
+        success: "failure",
+        error: "This email is not found",
       });
     }
   } catch (err) {
     res.status(500).json({
-      status: "faild",
-      message: err.message,
+      success: "failure",
+      error: "Error Occure" + err.message,
     });
   }
 };
 
 const userResetPass = async (req, res) => {
-  const {newPassword, confirmPass} = req.body
-  const {id,token} = req.params
-  try{
-    const userExits = await userSchema.findById(id)
-    const secretKey = userExits._id + process.env.JWT_SECRET_KEY
-    jwt.verify(token, secretKey)
-    if (newPassword && confirmPass){
-      if (newPassword !== confirmPass){
+  const { newPassword, confirmPass } = req.body;
+  const { id, token } = req.params;
+  try {
+    const userExits = await userSchema.findById(id);
+    const secretKey = userExits._id + process.env.JWT_SECRET_KEY;
+    jwt.verify(token, secretKey);
+    if (newPassword && confirmPass) {
+      if (newPassword !== confirmPass) {
         res.status(401).json({
-          status: "failed1",
-          message: "Password and confirm is not match"
-        }) 
-      } else{
-        const salt = await bcrypt.genSalt(10)
-        const newHashPassword = await bcrypt.hash(confirmPass, salt)
-        await userSchema.findByIdAndUpdate(userExits._id, {$set : {password : newHashPassword}})
+          success: "failure",
+          error: "Password and confirm is not match",
+        });
+      } else {
+        const salt = await bcrypt.genSalt(10);
+        const newHashPassword = await bcrypt.hash(confirmPass, salt);
+        await userSchema.findByIdAndUpdate(userExits._id, {
+          $set: { password: newHashPassword },
+        });
         res.status(200).json({
-          status: "Success",
-          message: "Password reset successfully"
-        })
+          success: "success",
+          message: "Password reset successfully",
+        });
       }
-    }else{
+    } else {
       res.status(403).json({
-        status: "failed2",
-        message: "all fields are required"
-      })
+        success: "failure",
+        error: "All fields are required",
+      });
     }
-  }catch(err){
-    console.log(err);
+  } catch (err) {
     res.status(500).json({
-      status: "failed3",
-      message: "Invalid token"
-    })
+      success: "failure",
+      error: "Error Occure " + err.message,
+    });
   }
-}
+};
 
 module.exports = {
   userSignup,
   userLogin,
   emailForResetPass,
-  userResetPass
+  userResetPass,
 };

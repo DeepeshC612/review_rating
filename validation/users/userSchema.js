@@ -5,8 +5,22 @@ const joipassword = joi.extend(joiPasswordExtendCore);
 const schema = {
   registerUser: joi
     .object({
-      userName: joi.string().max(20).required(),
-      userEmail: joi.string().email().required(),
+      userName: joi
+        .string()
+        .max(20)
+        .messages({
+          "userName.max": "{#label} should not exceed {#max} characters",
+        })
+        .required(),
+
+      userEmail: joi
+        .string()
+        .email()
+        .messages({
+          "userEmail.email": "{#label} please provide valid {#email} address",
+        })
+        .required(),
+
       password: joipassword
         .string()
         .minOfSpecialCharacters(1)
@@ -26,6 +40,7 @@ const schema = {
           "password.noWhiteSpaces": "{#label} should not contain white spaces",
         })
         .required(),
+
       phonenum: joi
         .number()
         .integer()
@@ -33,6 +48,7 @@ const schema = {
         .max(9999999999)
         .message("Invalid mobile Number")
         .required(),
+
       city: joi.string().required(),
       state: joi.string().required(),
     })
@@ -40,7 +56,13 @@ const schema = {
 
   LoginUser: joi
     .object({
-      userEmail: joi.string().email().required(),
+      userEmail: joi
+        .string()
+        .email()
+        .messages({
+          "userEmail.email": "{#label} please provide valid {#email} address",
+        })
+        .required(),
       password: joi.string().required(),
     })
     .unknown(true),

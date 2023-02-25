@@ -2,21 +2,16 @@ const express = require("express");
 const router = express.Router();
 const comp = require("../controllers/companyControllers");
 const validation = require("../validation/company/CompanyValidation");
-const {upload} = require('../middlewares/multiStoreMiddelware');
+const { upload } = require('../middlewares/multiStoreMiddleware')
 
 router.post(
-  "/CreateCompany",
+  "/Create/:id",
   upload.single("CompanyLogo"),
   validation.registerCompValidation,
   comp.createCompany
 );
-router.post(
-  "/Company-details/:id",
-  comp.detailsComp
-);
-router.get(
-  "/findCompany",
-  comp.allComp
-);
+router.post("/details/:id", comp.detailsComp);
+router.get("/allCompany", comp.ListComp);
+router.get("/Search", comp.searchComp);
 
 module.exports = router;
